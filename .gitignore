@@ -1,0 +1,17 @@
+node_modules
+.env
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Hardhat files
+cache
+artifacts
+docs/*
+
+# OpenZeppelin
+.openzeppelin/dev-*.json
+.openzeppelin/.session
+
+id.json

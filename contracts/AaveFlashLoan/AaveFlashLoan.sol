@@ -4,11 +4,10 @@ pragma solidity ^0.8.26;
 import '../precompiles/ICallSolana.sol';
 import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
 import "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
-import "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
-
 
 interface IErc20ForSpl {
     function transferSolana(bytes32 to, uint64 amount) external returns (bool);
+    function approve(address spender, uint256 value) external returns (bool);
     function tokenMint() external view returns (bytes32);
 }
 
@@ -21,9 +20,7 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
     uint public lastLoan;
     uint public lastLoanFee;
 
-    constructor(
-        address _addressProvider
-    ) FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider)) {}
+    constructor(address _addressProvider) FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider)) {}
 
     function getNeonAddress(address _address) public view returns(bytes32) {
         return CALL_SOLANA.getNeonAddress(_address);
@@ -34,19 +31,15 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
     }
 
     function flashLoanSimple(address _token, uint256 _amount, bytes memory instructionData1, bytes memory instructionData2) public {
-        address receiverAddress = address(this);
-        address asset = _token;
-        uint256 amount = _amount;
         bytes memory params = abi.encode(instructionData1, instructionData2);
-        uint16 referralCode = 0;
 
-        // request loan from Aave
+        // request flash loan from Aave V3 protocol
         POOL.flashLoanSimple(
-            receiverAddress,
-            asset,
-            amount,
+            address(this),
+            _token,
+            _amount,
             params,
-            referralCode
+            0
         );
     }
 
@@ -57,7 +50,7 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         address initiator,
         bytes calldata params
     )  external override returns (bool) {
-        require(msg.sender == address(POOL), "ERROR: INVALID MSG.SENDER");
+        require(msg.sender == address(POOL), "ERROR: AUTH - INVALID POOL");
         lastLoan = amount;
         lastLoanFee = premium;
 
@@ -75,21 +68,12 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         );
 
         (bytes memory instructionData1, bytes memory instructionData2) = abi.decode(params, (bytes, bytes));
-        _execute(0, instructionData1);
-        _execute(0, instructionData2);
+
+        CALL_SOLANA.execute(0, instructionData1); // Request Raydium's program on Solana to swap $USDC for $SAMO
+        CALL_SOLANA.execute(0, instructionData2); // Request Raydium's program on Solana to swap back $SAMO for $USDC
 
         // approval to return back the loan + the fee
-        IERC20(asset).approve(address(POOL), amount + premium);
+        IErc20ForSpl(asset).approve(address(POOL), amount + premium);
         return true;
-    }
-
-    function _execute(
-        uint64 lamports,
-        bytes memory instruction
-    ) internal {
-        CALL_SOLANA.execute(
-            lamports,
-            instruction
-        );
     }
 }

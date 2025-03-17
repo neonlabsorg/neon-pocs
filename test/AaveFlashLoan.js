@@ -19,7 +19,6 @@ const AaveFlashLoanAddress = config.DATA.EVM.ADDRESSES.AAVE.AaveFlashLoanTest;
 let AaveFlashLoan;
 let USDC;
 const RECEIPTS_COUNT = 1;
-let payer;
 let contractPublicKey;
 let neon_getEvmParams;
 
@@ -46,9 +45,6 @@ describe('Test init', async function () {
             await AaveFlashLoan.waitForDeployment();
             console.log('\AaveFlashLoan deployed at', "\x1b[32m", AaveFlashLoan.target, "\x1b[30m", '\n');
         }
-        
-        payer = ethers.encodeBase58(await AaveFlashLoan.getPayer());
-        console.log(payer, 'payer');
 
         const contractPublicKeyInBytes = await AaveFlashLoan.getNeonAddress(AaveFlashLoan.target);
         contractPublicKey = ethers.encodeBase58(contractPublicKeyInBytes);
@@ -60,8 +56,8 @@ describe('Test init', async function () {
     describe('ERC20ForSPL tests', function() {
         it('Validate Aave V3 flash loan with composability', async function () {
             // dummy transfer to the contract so it could repay the loan fee
-            /* et tx = await USDC.transfer(AaveFlashLoan.target, '1000000');
-            await tx.wait(RECEIPTS_COUNT); */
+            /* let tx = await USDC.transfer(AaveFlashLoan.target, '1000000');
+            await tx.wait(RECEIPTS_COUNT);  */
 
             const flashLoanRequestAmount = '10000000';
             const orcaSwapInstructions = await buildOrcaSwap(flashLoanRequestAmount);
@@ -157,7 +153,7 @@ async function buildOrcaSwap(amountIn) {
         whirlpool,
         TokenB.mint,
         DecimalUtil.toBN(new Decimal(DecimalUtil.fromBN(quote1.estimatedAmountOut, TokenB.decimals).toString()), TokenB.decimals), // Input Token Mint amount
-        Percentage.fromFraction(10, 1000), // Acceptable slippage (10/1000 = 1%)
+        Percentage.fromFraction(5, 1000), // Acceptable slippage (5/1000 = 5%)
         ctx.program.programId,
         ctx.fetcher,
         IGNORE_CACHE
@@ -182,5 +178,3 @@ async function buildOrcaSwap(amountIn) {
 
     return swaps;
 }
-
-// curl -X POST --data '{"jsonrpc":"2.0","method":"neon_getSolanaTransactionByNeonTransaction","params":["0xb68d329ab0d6be83ce1a4f1ada9b28f08b8ce0e2080d07514ffcf5a44643a4e3"],"id":1}' -H "Content-Type: application/json" https://curve-stand.neontest.xyz | jq

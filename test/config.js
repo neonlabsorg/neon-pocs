@@ -6,7 +6,7 @@ const config = {
         EVM: {
             ADDRESSES: {
                 AAVE: {
-                    AaveFlashLoanTest: '0xa66b5f1f6Fb3e8979EaF655F1eD38273ECF6316B',
+                    AaveFlashLoanTest: '0x84b87ae02D9aE9acf85b43Ba8B172e26356279Ed',
                     AAVE_POOL: '0x9eA85823b7B736189e663ddef0FEE250EF0d23E1', // Pool-Proxy-Aave.json
                     ADDRESS_PROVIDER: '0x3792F5eD078EEbE34419627E91D648e8Ac3C56e5'
                 },

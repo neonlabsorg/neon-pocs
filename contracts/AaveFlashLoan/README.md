@@ -1,4 +1,6 @@
-# Aave V3 flash loan with composability requests to Solana
+# POC - Aave V3 flash loan with composability requests to Solana
+
+The following POC aims to validate that it's possible to request a flash loan from DeFi protocol on Neon EVM _( an Aave V3 fork )_ and to use the loan in the context of Solana. In this example we're requesting a loan of $USDC tokens and swapping them against $SAMO tokens _( both tokens are arbitrary tokens supported by Orca program on Solana )_. At the end of the 2nd swap request to Orca we're repaying back the flash loan and the fee back to the Aave V3 fork. The requesting from Neon EVM to Solana is possible through a composability feature that Neon EVM supports and more specifically Solidity requests to a custom precompile `0xFF00000000000000000000000000000000000006`. More details about the feature [here](https://neonevm.org/docs/composability/common_solana_terminology).
 
 Sample transaction - [https://devnet.neonscan.org/tx/0x5c541a2f520ece57000d6a0970c6e7abed05414019962c418afde765c391ae89](https://devnet.neonscan.org/tx/0x5c541a2f520ece57000d6a0970c6e7abed05414019962c418afde765c391ae89)
 

@@ -6,7 +6,7 @@ const config = {
         EVM: {
             ADDRESSES: {
                 AAVE: {
-                    AaveFlashLoanTest: '0x84b87ae02D9aE9acf85b43Ba8B172e26356279Ed',
+                    AaveFlashLoanTest: '0x1f464349eEAC5DbAD27c38cCe222d4D28bAc0824',
                     AAVE_POOL: '0x9eA85823b7B736189e663ddef0FEE250EF0d23E1', // Pool-Proxy-Aave.json
                     ADDRESS_PROVIDER: '0x3792F5eD078EEbE34419627E91D648e8Ac3C56e5'
                 },
@@ -135,6 +135,31 @@ const config = {
                     (mint) => tokenAccounts.find((acc) => acc.mint.equals(mint)).account
                 );
             }
+        },
+        airdropNEON: async function(address) {
+            const postRequestNeons = await fetch('https://api.neonfaucet.org/request_neon', {
+                method: 'POST',
+                body: JSON.stringify({"amount": 100, "wallet": address}),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log('Airdrop NEONs to', address);
+
+            await config.utils.asyncTimeout(1000);
+        },
+        airdropSOL: async function(account) {
+            let postRequest = await fetch(config.SOLANA_NODE, {
+                method: 'POST',
+                body: JSON.stringify({"jsonrpc":"2.0", "id":1, "method":"requestAirdrop", "params": [account.publicKey.toBase58(), 100000000000]}),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log('Airdrop SOLs to', account.publicKey.toBase58());
+
+            await config.utils.asyncTimeout(1000);
+        },
+        asyncTimeout: async function(timeout) {
+            return new Promise((resolve) => {
+                setTimeout(() => resolve(), timeout);
+            })
         }
     },
 };

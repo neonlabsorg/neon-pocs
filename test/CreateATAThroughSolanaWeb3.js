@@ -5,8 +5,7 @@ const {
     getAssociatedTokenAddress,
     getAssociatedTokenAddressSync,
     TOKEN_PROGRAM_ID,
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    getAccount
+    ASSOCIATED_TOKEN_PROGRAM_ID
 } = require('@solana/spl-token');
 require("dotenv").config();
 const { config } = require('./config');
@@ -18,16 +17,15 @@ if (process.env.ANCHOR_WALLET == undefined) {
 const keypair = web3.Keypair.fromSecretKey(Uint8Array.from(new Uint8Array(JSON.parse(fs.readFileSync(process.env.ANCHOR_WALLET).toString()))));
 console.log(keypair.publicKey.toBase58(), 'payer');
 
-const publicKey = new web3.PublicKey('4ZDHjX48dUPBnYkGdPrLVwbEJtSNhkCF5BVznvqGw3HE'); // set your contractPublicKey here
 const tokenMintsArray = [
     config.DATA.SVM.ADDRESSES.devSAMO,
     config.DATA.SVM.ADDRESSES.devUSDC
 ];
 let atasToBeCreated = '';
 
-async function init() {
-    if (await connection.getBalance(keypair.publicKey) < 10000000) {
-        return console.error('\nYou need at least 0.01 SOL in your wallet to proceed with transactions execution.');
+async function createATA(publicKey) {
+    if (await connection.getBalance(keypair.publicKey) < 100000000) {
+        await config.utils.airdropSOL(keypair);
     }
     const transaction = new web3.Transaction();
 
@@ -40,10 +38,6 @@ async function init() {
             ASSOCIATED_TOKEN_PROGRAM_ID
         );
         const ataInfo = await connection.getAccountInfo(associatedToken);
-        console.log(ataInfo, 'ataInfo');
-
-        /* console.log(await getAccount(connection, associatedToken), 'getAccount');
-        return; */
 
         // create ATA only if it's missing
         if (!ataInfo || !ataInfo.data) {
@@ -65,8 +59,6 @@ async function init() {
                 new web3.PublicKey(publicKey),
                 true
             );
-            console.log(tokenMintsArray[i], 'tokenMintsArray[i]');
-            console.log(ATA, 'ATA');
         }
     }
 
@@ -80,7 +72,10 @@ async function init() {
 
         console.log('\nTx signature', signature);
     } else {
-        return console.error('\nNo instructions included into transaction.');
+        return console.error('\nNo instructions to be performed, all ATA accounts are initialized.');
     }
 } 
-init();
+
+module.exports = {
+    createATA
+};

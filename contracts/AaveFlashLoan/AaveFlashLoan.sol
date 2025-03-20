@@ -12,6 +12,9 @@ interface IErc20ForSpl {
 }
 
 
+/// @title AaveFlashLoan
+/// @author https://twitter.com/mnedelchev_
+/// @notice This contract serve as POC that a flash loan could be taken from the Neon EVM chain and used inside Solana. The protocol that is used to request flash is a fork of Aave V3.
 contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
     ICallSolana public constant CALL_SOLANA = ICallSolana(0xFF00000000000000000000000000000000000006);
     bytes32 public constant TOKEN_PROGRAM = 0x06ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9;
@@ -30,14 +33,14 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         return CALL_SOLANA.getPayer();
     }
 
-    function flashLoanSimple(address _token, uint256 _amount, bytes memory instructionData1, bytes memory instructionData2) public {
+    function flashLoanSimple(address token, uint256 amount, bytes memory instructionData1, bytes memory instructionData2) public {
         bytes memory params = abi.encode(instructionData1, instructionData2);
 
         // request flash loan from Aave V3 protocol
         POOL.flashLoanSimple(
             address(this),
-            _token,
-            _amount,
+            token,
+            amount,
             params,
             0
         );
@@ -72,7 +75,7 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         CALL_SOLANA.execute(0, instructionData1); // Request Raydium's program on Solana to swap $USDC for $SAMO
         CALL_SOLANA.execute(0, instructionData2); // Request Raydium's program on Solana to swap back $SAMO for $USDC
 
-        // approval to return back the loan + the fee
+        // approval to return back the flashloan + the fee
         IErc20ForSpl(asset).approve(address(POOL), amount + premium);
         return true;
     }

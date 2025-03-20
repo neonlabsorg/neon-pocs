@@ -8,6 +8,7 @@ const { WhirlpoolContext, buildWhirlpoolClient, ORCA_WHIRLPOOL_PROGRAM_ID, PDAUt
 const { DecimalUtil, Percentage } = require("@orca-so/common-sdk");
 const { Decimal } = require("decimal.js");
 const { config } = require('./config');
+const { createATA } = require('./CreateATAThroughSolanaWeb3');
 require("dotenv").config();
 
 if (process.env.ANCHOR_PROVIDER_URL != config.SOLANA_NODE || process.env.ANCHOR_WALLET == undefined) {
@@ -25,6 +26,10 @@ let neon_getEvmParams;
 describe('Test init', async function () {
     before(async function() {
         [owner] = await ethers.getSigners();
+        if (await ethers.provider.getBalance(owner.address) == 0) {
+            await config.utils.airdropNEON(owner.address);
+        }
+
         const AaveFlashLoanFactory = await ethers.getContractFactory('contracts/AaveFlashLoan/AaveFlashLoan.sol:AaveFlashLoan');
         USDC = await hre.ethers.getContractAt('contracts/interfaces/IERC20.sol:IERC20', config.DATA.EVM.ADDRESSES.devUSDC);
 
@@ -51,15 +56,21 @@ describe('Test init', async function () {
         console.log(contractPublicKey, 'contractPublicKey');
 
         console.log(ethers.encodeBase58(await USDC.tokenMint()), 'tokenMint');
+
+        await createATA(new web3.PublicKey(contractPublicKey));
     });
 
     describe('ERC20ForSPL tests', function() {
         it('Validate Aave V3 flash loan with composability', async function () {
-            // dummy transfer to the contract so it could repay the loan fee
-            /* let tx = await USDC.transfer(AaveFlashLoan.target, '1000000');
-            await tx.wait(RECEIPTS_COUNT);  */
+            let tx;
+            // dummy transfer to the contract so it could be able to repay the flashloan fee
+            if (await USDC.balanceOf(AaveFlashLoan.target) == 0) {
+                console.log('Transferring some USDC to the contract so it could be able to repay the flashloan fee.');
+                tx = await USDC.transfer(AaveFlashLoan.target, '1000000');
+                await tx.wait(RECEIPTS_COUNT); 
+            }
 
-            const flashLoanRequestAmount = '10000000';
+            const flashLoanRequestAmount = '10000000'; // 10 USDC
             const orcaSwapInstructions = await buildOrcaSwap(flashLoanRequestAmount);
             console.log(orcaSwapInstructions, 'orcaSwapInstructions');
 
@@ -73,8 +84,11 @@ describe('Test init', async function () {
             );
             await tx.wait(RECEIPTS_COUNT);
 
-            console.log(tx.hash, 'hash');
-            console.log(await USDC.balanceOf(AaveFlashLoan.target), 'balanceOf');
+            console.log('\n\n\n');
+            console.log(tx.hash, 'Transaction hash');
+            console.log(await USDC.balanceOf(AaveFlashLoan.target), 'Contract USDC balanceOf');
+            console.log(await AaveFlashLoan.lastLoan(), 'lastLoan');
+            console.log(await AaveFlashLoan.lastLoanFee(), 'lastLoanFee');
         });
     });
 });

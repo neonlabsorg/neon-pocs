@@ -33,20 +33,20 @@ module.exports = {
         network: "neonevm",
         chainId: 245022926,
         urls: {
-          apiURL: "https://devnet-api.neonscan.org/hardhat/verify",
-          browserURL: "https://devnet.neonscan.org",
+          apiURL: "https://neon-devnet.blockscout.com/api",
+          browserURL: "https://neon-devnet.blockscout.com",
         },
       },
       {
         network: "neonevm",
         chainId: 245022934,
         urls: {
-          apiURL: "https://api.neonscan.org/hardhat/verify",
-          browserURL: "https://neonscan.org",
+          apiURL: "https://neon.blockscout.com/api",
+          browserURL: "https://neon.blockscout.com",
         },
       },
     ],
-  },
+    },
   networks: {
     neondevnet: {
       url: "https://devnet.neonevm.org",

@@ -7,4 +7,4 @@ The following POC aims to validate that it's possible to request a flash loan fr
 ### Run the POC
 * ```npx hardhat test test/AaveFlashLoan.js --network neondevnet```
 
-![alt text](https://github.com/neonlabsorg/neon-pocs/blob/master/contracts/AaveFlashLoan/Aave%20V3%20flash%20loans%20with%20composability%20swaps%20to%20Orca.jpg)
+![alt text](https://github.com/neonlabsorg/neon-pocs/blob/master/contracts/AaveFlashLoan/Flashloan_Infographic.png)

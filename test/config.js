@@ -5,11 +5,17 @@ const config = {
     DATA: {
         EVM: {
             ADDRESSES: {
+                MemeLaunchpad: {
+                    MemeLaunchpadTest: '',
+                    BondingCurve: '0x0Fc6Ec7F9F06bd733913C1Fcd10BFc959a1F88DC'
+                },
+                ERC20ForSplFactory: '0xF6b17787154C418d5773Ea22Afc87A95CAA3e957',
                 AAVE: {
                     AaveFlashLoanTest: '0x1f464349eEAC5DbAD27c38cCe222d4D28bAc0824',
                     AAVE_POOL: '0x9eA85823b7B736189e663ddef0FEE250EF0d23E1', // Pool-Proxy-Aave.json
                     ADDRESS_PROVIDER: '0x3792F5eD078EEbE34419627E91D648e8Ac3C56e5'
                 },
+                WSOL: '0xc7Fc9b46e479c5Cb42f6C458D1881e55E6B7986c',
                 devUSDC: '0x146c38c2E36D34Ed88d843E013677cCe72341794' // USDC-TestnetMintableERC20-Aave.json
             }
         },

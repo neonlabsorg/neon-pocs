@@ -15,50 +15,55 @@ if (process.env.ANCHOR_WALLET == undefined) {
     return console.error('Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_WALLET=./id.json');
 }
 const keypair = web3.Keypair.fromSecretKey(Uint8Array.from(new Uint8Array(JSON.parse(fs.readFileSync(process.env.ANCHOR_WALLET).toString()))));
-console.log(keypair.publicKey.toBase58(), 'payer');
 
-const tokenMintsArray = [
+const defaultTokenMintsArray = [
     config.DATA.SVM.ADDRESSES.devSAMO,
     config.DATA.SVM.ADDRESSES.devUSDC
 ];
 let atasToBeCreated = '';
 
-async function createATA(publicKey) {
+async function createATA(publicKeys, tokenMintsArray) {
     if (await connection.getBalance(keypair.publicKey) < 100000000) {
         await config.utils.airdropSOL(keypair);
     }
+
+    if (tokenMintsArray == undefined) {
+        tokenMintsArray = defaultTokenMintsArray;
+    }
     const transaction = new web3.Transaction();
 
-    for (let i = 0, len = tokenMintsArray.length; i < len; ++i) {
-        const associatedToken = getAssociatedTokenAddressSync(
-            new web3.PublicKey(tokenMintsArray[i]), 
-            publicKey, 
-            true, 
-            TOKEN_PROGRAM_ID, 
-            ASSOCIATED_TOKEN_PROGRAM_ID
-        );
-        const ataInfo = await connection.getAccountInfo(associatedToken);
-
-        // create ATA only if it's missing
-        if (!ataInfo || !ataInfo.data) {
-            atasToBeCreated += tokenMintsArray[i] + ', ';
-
-            transaction.add(
-                createAssociatedTokenAccountInstruction(
-                    keypair.publicKey,
-                    associatedToken,
-                    publicKey,
-                    new web3.PublicKey(tokenMintsArray[i]), 
-                    TOKEN_PROGRAM_ID, 
-                    ASSOCIATED_TOKEN_PROGRAM_ID
-                )
+    for (let i = 0, len = publicKeys.length; i < len; ++i) {
+        for (let y = 0, leny = tokenMintsArray.length; y < leny; ++y) {
+            const associatedToken = getAssociatedTokenAddressSync(
+                new web3.PublicKey(tokenMintsArray[y]), 
+                publicKeys[i], 
+                true, 
+                TOKEN_PROGRAM_ID, 
+                ASSOCIATED_TOKEN_PROGRAM_ID
             );
-        } else {
-            const ATA = await getAssociatedTokenAddress(
-                new web3.PublicKey(tokenMintsArray[i]), 
-                new web3.PublicKey(publicKey),
-                true
-            );
+            const ataInfo = await connection.getAccountInfo(associatedToken);
+
+            // create ATA only if it's missing
+            if (!ataInfo || !ataInfo.data) {
+                atasToBeCreated += tokenMintsArray[y] + ', ';
+
+                transaction.add(
+                    createAssociatedTokenAccountInstruction(
+                        keypair.publicKey,
+                        associatedToken,
+                        publicKeys[i],
+                        new web3.PublicKey(tokenMintsArray[y]), 
+                        TOKEN_PROGRAM_ID, 
+                        ASSOCIATED_TOKEN_PROGRAM_ID
+                    )
+                );
+            } else {
+                const ATA = await getAssociatedTokenAddress(
+                    new web3.PublicKey(tokenMintsArray[y]), 
+                    new web3.PublicKey(publicKeys[i]),
+                    true
+                );
+            }
         }
     }
 
@@ -71,6 +76,7 @@ async function createATA(publicKey) {
         );
 
         console.log('\nTx signature', signature);
+        await config.utils.asyncTimeout(5000);
     } else {
         return console.error('\nNo instructions to be performed, all ATA accounts are initialized.');
     }

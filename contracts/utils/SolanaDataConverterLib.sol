@@ -5,6 +5,17 @@ pragma solidity ^0.8.28;
 /// @author https://twitter.com/mnedelchev_
 /// @notice This contract serves as a helper library when interacting with precompile QueryAccount ( 0xFF00000000000000000000000000000000000002 )
 library SolanaDataConverterLib {
+    function toBool(bytes memory _bytes, uint256 _start) internal pure returns (bool result) {
+        require(_bytes.length >= _start + 2, "toBool_outOfBounds");
+        bool tempBool;
+
+        assembly {
+            tempBool := mload(add(add(_bytes, 0x20), _start))
+        }
+
+        return tempBool;
+    }
+
     function toAddress(bytes memory _bytes, uint256 _start) internal pure returns (address) {
         require(_bytes.length >= _start + 20, "toAddress_outOfBounds");
         address tempAddress;
@@ -102,6 +113,16 @@ library SolanaDataConverterLib {
         }
 
         return tempUint;
+    }
+
+    function readLittleEndianUnsigned16(uint16 input) internal pure returns (uint16) {
+        // swap bytes
+        return (input >> 8) | (input << 8);
+    }
+
+    function readLittleEndianSigned16(uint16 input) internal pure returns (int16) {
+        // swap bytes and cast to signed
+        return int16((input >> 8) | (input << 8));
     }
 
     function readLittleEndianUnsigned32(uint32 input) internal pure returns (uint32) {

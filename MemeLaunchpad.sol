@@ -4,7 +4,6 @@ pragma solidity 0.8.28;
 import {IERC20ForSplFactory} from "../interfaces/IERC20ForSplFactory.sol";
 import {IERC20ForSpl} from "../interfaces/IERC20ForSpl.sol";
 import {ICallSolana} from '../precompiles/ICallSolana.sol';
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {BondingCurve} from "./BondingCurve.sol";
@@ -200,9 +199,9 @@ contract MemeLaunchpad is ReentrancyGuard, Ownable {
         return tokenAddress;
     }
 
-    /// @notice Buys tokens during the funding phase. If funding goal is reached, creates Raydium pool and locks all of the initial liquidity
+    /// @notice Buys tokens during the funding phase. If funding goal is reached, creates Raydium pool
     /// @param tokenAddress Address of the token to buy
-    /// @param amount Amount of WSOL to spend
+    /// @param wsolAmount Amount of WSOL to spend
     function buy(
         address tokenAddress, 
         uint64 amount
@@ -362,11 +361,6 @@ contract MemeLaunchpad is ReentrancyGuard, Ownable {
         );
     }
 
-    /// @notice Buys tokens during the funding phase. If funding goal is reached, creates Raydium pool and locks all of the initial liquidity
-    /// @param poolId The Solana account of the Raydium pool
-    /// @param tokenA The EVM address of the pool's token A
-    /// @param tokenB The EVM address of the pool's token B
-    /// @param lpFeeAmount Amount of fee to be collected ( passing type(uint64).max will collect all the current pending fees )
     function collectPoolFees(
         bytes32 poolId,
         address tokenA,

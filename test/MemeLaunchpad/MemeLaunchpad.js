@@ -69,7 +69,7 @@ describe('Test init', async function () {
                 ethers.parseUnits('8000', 9)
             );
             let receipt = await tx.wait(RECEIPTS_COUNT);
-            console.log(tx.hash, 'tx');
+            console.log(tx.hash, 'createTokenSale tx');
 
             Token = await hre.ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', receipt.logs[2].args[0]);
 
@@ -100,7 +100,7 @@ describe('Test init', async function () {
                 10000000 // 0.01 SOL
             );
             let receipt = await tx.wait(RECEIPTS_COUNT);
-            console.log(tx.hash, 'tx');
+            console.log(tx.hash, 'buy tx');
 
             expect(initialWSOLBalance).to.be.greaterThan(await WSOL.balanceOf(owner.address));
             expect(await WSOL.balanceOf(MemeLaunchpad.target)).to.be.greaterThan(initialWSOLBalanceContract);
@@ -121,9 +121,9 @@ describe('Test init', async function () {
                 Token.target,
                 150000000 // 0.15 SOL
             );
+            console.log(tx.hash, 'tx.hash');
             let receipt = await tx.wait(RECEIPTS_COUNT);
-            console.log(tx.hash, 'tx');
-            console.log(receipt.logs, 'receipt.logs');
+            console.log(tx.hash, 'buy tx');
 
             poolId = receipt.logs[7].args[1];
             console.log('\nRaydium Pool ID account - ', ethers.encodeBase58(poolId));
@@ -143,7 +143,7 @@ describe('Test init', async function () {
             
             let tx = await MemeLaunchpad.claimTokenSaleFee();
             await tx.wait(RECEIPTS_COUNT);
-            console.log(tx.hash, 'tx claimTokenSaleFee');
+            console.log(tx.hash, 'claimTokenSaleFee tx');
 
             expect(await WSOL.balanceOf(owner.address)).to.be.greaterThan(wsolBalance);
             
@@ -161,7 +161,7 @@ describe('Test init', async function () {
                 '18446744073709551615' // withdraw maximum available fees
             );
             await tx.wait(RECEIPTS_COUNT);
-            console.log(tx.hash, 'tx collectPoolFees');
+            console.log(tx.hash, 'collectPoolFees tx');
 
             expect(await WSOL.balanceOf(owner.address)).to.be.greaterThan(initialTokenABalance);
             expect(await Token.balanceOf(owner.address)).to.be.greaterThan(initialTokenBBalance);

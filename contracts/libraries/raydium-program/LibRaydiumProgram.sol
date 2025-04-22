@@ -356,13 +356,12 @@ library LibRaydiumProgram {
             /// 82 bytes for NFT Mint account
             /// 165 bytes for NFT Token account
             /// 256 bytes for the creation of CP Lock PDA
-            /// 165 bytes for Authority's LP Token Account
-            /// 3x 128 bytes = 256 bytes for each account ACCOUNT_STORAGE_OVERHEAD ( skipping the first account, because getRentExemptionBalance already is adding 1x ACCOUNT_STORAGE_OVERHEAD)
+            /// 165 bytes for CPMMPoolAuthPubkey's LP Token account
+            /// 3x 128 bytes = 384 bytes for each account ACCOUNT_STORAGE_OVERHEAD ( skipping the first account, because getRentExemptionBalance already is adding 1x ACCOUNT_STORAGE_OVERHEAD)
         uint64 accountsBytesSize = 1052;
         if (withMetadata) {
             /// 607 bytes for account getPdaMetadataKey + 1x ACCOUNT_STORAGE_OVERHEAD
-            /// 165 bytes for CPMMPoolAuthPubkey's LP Token account + 1x ACCOUNT_STORAGE_OVERHEAD
-            accountsBytesSize += 1028;
+            accountsBytesSize += 735;
         }
         lamports = LibSystemData.getRentExemptionBalance(
             accountsBytesSize,

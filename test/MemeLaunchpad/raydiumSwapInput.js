@@ -1,5 +1,4 @@
 const web3 = require("@solana/web3.js");
-const fs = require("fs");
 const {
     Raydium,
     TxVersion,
@@ -9,14 +8,12 @@ const {
     CurveCalculator
 } = require("@raydium-io/raydium-sdk-v2");
 const {
-    NATIVE_MINT,
-    getAccount,
-    getAssociatedTokenAddress
+    NATIVE_MINT
 } = require("@solana/spl-token");
-const bs58 = require('bs58');
 const BN = require('bn.js');
 const Decimal = require('decimal.js');
 const { config } = require('../config');
+const bs58 = require("bs58");
 require("dotenv").config();
 
 const connection = new web3.Connection(config.SOLANA_NODE, "processed");
@@ -24,7 +21,9 @@ if (process.env.ANCHOR_WALLET == undefined) {
     console.error('Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_WALLET=./id.json');
     process.exit();
 }
-const keypair = web3.Keypair.fromSecretKey(Uint8Array.from(new Uint8Array(JSON.parse(fs.readFileSync(process.env.ANCHOR_WALLET).toString()))));
+const keypair = web3.Keypair.fromSecretKey(
+    bs58.decode(process.env.PRIVATE_KEY_SOLANA)
+);
 
 const VALID_PROGRAM_ID = new Set([CREATE_CPMM_POOL_PROGRAM.toBase58(), DEV_CREATE_CPMM_POOL_PROGRAM.toBase58()])
 function isValidCpmm(id) {

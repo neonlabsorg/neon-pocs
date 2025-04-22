@@ -1,5 +1,4 @@
 const web3 = require("@solana/web3.js");
-const fs = require("fs");
 const {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
@@ -7,6 +6,7 @@ const {
     TOKEN_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID
 } = require('@solana/spl-token');
+const bs58 = require("bs58");
 require("dotenv").config();
 const { config } = require('./config');
 
@@ -15,7 +15,9 @@ if (process.env.ANCHOR_WALLET == undefined) {
     console.error('Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_WALLET=./id.json');
     process.exit();
 }
-const keypair = web3.Keypair.fromSecretKey(Uint8Array.from(new Uint8Array(JSON.parse(fs.readFileSync(process.env.ANCHOR_WALLET).toString()))));
+const keypair = web3.Keypair.fromSecretKey(
+    bs58.decode(process.env.PRIVATE_KEY_SOLANA)
+);
 
 const defaultTokenMintsArray = [
     config.DATA.SVM.ADDRESSES.devSAMO,

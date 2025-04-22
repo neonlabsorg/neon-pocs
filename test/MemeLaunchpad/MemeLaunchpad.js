@@ -121,7 +121,6 @@ describe('Test init', async function () {
                 Token.target,
                 150000000 // 0.15 SOL
             );
-            console.log(tx.hash, 'tx.hash');
             let receipt = await tx.wait(RECEIPTS_COUNT);
             console.log(tx.hash, 'buy tx');
 

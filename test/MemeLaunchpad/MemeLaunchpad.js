@@ -89,6 +89,12 @@ describe('Test init', async function () {
             const initialWSOLBalance = await WSOL.balanceOf(owner.address);
             const initialWSOLBalanceContract = await WSOL.balanceOf(MemeLaunchpad.target);
 
+            const amount = 10000000; // 0.01 SOL
+            if (parseInt(initialWSOLBalance) < amount) {
+                console.error('Not enough WSOL balance. Needed', amount, 'WSOLs, having', initialWSOLBalance);
+                return;
+            }
+
             let tx;
             if (await WSOL.allowance(owner.address, MemeLaunchpad.target) == 0) {
                 tx = await WSOL.approve(MemeLaunchpad.target, ethers.MaxUint256);
@@ -97,10 +103,10 @@ describe('Test init', async function () {
 
             tx = await MemeLaunchpad.buy(
                 Token.target,
-                10000000 // 0.01 SOL
+                amount
             );
-            let receipt = await tx.wait(RECEIPTS_COUNT);
             console.log(tx.hash, 'buy tx');
+            let receipt = await tx.wait(RECEIPTS_COUNT);
 
             expect(initialWSOLBalance).to.be.greaterThan(await WSOL.balanceOf(owner.address));
             expect(await WSOL.balanceOf(MemeLaunchpad.target)).to.be.greaterThan(initialWSOLBalanceContract);
@@ -111,6 +117,12 @@ describe('Test init', async function () {
             const initialTokenBBalance = await Token.balanceOf(owner.address);
             const initialWSOLBalanceContract = await WSOL.balanceOf(MemeLaunchpad.target);
 
+            const amount = 150000000; // 0.15 SOL
+            if (parseInt(initialTokenABalance) < amount) {
+                console.error('Not enough WSOL balance. Needed', amount, 'WSOLs, having', initialTokenABalance);
+                return;
+            }
+
             let tx;
             if (await WSOL.allowance(owner.address, MemeLaunchpad.target) == 0) {
                 tx = await WSOL.approve(MemeLaunchpad.target, ethers.MaxUint256);
@@ -119,10 +131,10 @@ describe('Test init', async function () {
 
             tx = await MemeLaunchpad.buy(
                 Token.target,
-                150000000 // 0.15 SOL
+                amount
             );
-            let receipt = await tx.wait(RECEIPTS_COUNT);
             console.log(tx.hash, 'buy tx');
+            let receipt = await tx.wait(RECEIPTS_COUNT);
 
             poolId = receipt.logs[7].args[1];
             console.log('\nRaydium Pool ID account - ', ethers.encodeBase58(poolId));

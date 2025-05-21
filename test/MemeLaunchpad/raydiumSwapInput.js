@@ -64,6 +64,12 @@ async function raydiumSwapInput(poolId) {
     const slippage = new Percent(5, 100); // 5%
     const baseIn = inputMint === poolInfo.mintA.address;
 
+    const balance = await connection.getBalance(keypair.publicKey);
+    if (balance < uiInputAmount * 10 ** 9) {
+        console.error('Not enough SOL balance. Needed', uiInputAmount, 'SOLs, having', balance);
+        return;
+    }
+
     const swapResult = CurveCalculator.swap(
         inputAmount,
         baseIn ? rpcData.baseReserve : rpcData.quoteReserve,

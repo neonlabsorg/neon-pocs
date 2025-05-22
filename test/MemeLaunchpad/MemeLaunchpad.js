@@ -21,7 +21,8 @@ describe('Test init', async function () {
     before(async function() {
         [owner] = await ethers.getSigners();
         if (await ethers.provider.getBalance(owner.address) == 0) {
-            await config.utils.airdropNEON(owner.address);
+            console.error('Deployer has 0 NEON balance, please grab some at https://neonfaucet.org/.');
+            process.exit();
         }
 
         const MemeLaunchpadFactory = await ethers.getContractFactory('contracts/MemeLaunchpad/MemeLaunchpad.sol:MemeLaunchpad');
@@ -92,7 +93,7 @@ describe('Test init', async function () {
             const amount = 10000000; // 0.01 SOL
             if (parseInt(initialWSOLBalance) < amount) {
                 console.error('Not enough WSOL balance. Needed', amount, 'WSOLs, having', initialWSOLBalance);
-                return;
+                process.exit();
             }
 
             let tx;
@@ -120,7 +121,7 @@ describe('Test init', async function () {
             const amount = 150000000; // 0.15 SOL
             if (parseInt(initialTokenABalance) < amount) {
                 console.error('Not enough WSOL balance. Needed', amount, 'WSOLs, having', initialTokenABalance);
-                return;
+                process.exit();
             }
 
             let tx;

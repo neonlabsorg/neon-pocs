@@ -7,8 +7,8 @@ const { AnchorProvider } = require("@coral-xyz/anchor");
 const { WhirlpoolContext, buildWhirlpoolClient, ORCA_WHIRLPOOL_PROGRAM_ID, PDAUtil, swapQuoteByInputToken, IGNORE_CACHE, WhirlpoolIx, SwapUtils } = require("@orca-so/whirlpools-sdk");
 const { DecimalUtil, Percentage } = require("@orca-so/common-sdk");
 const { Decimal } = require("decimal.js");
-const { config } = require('./config');
-const { createATA } = require('./CreateATAThroughSolanaWeb3');
+const { config } = require('../config');
+const { createATA } = require('../CreateATAThroughSolanaWeb3');
 require("dotenv").config();
 
 if (process.env.ANCHOR_PROVIDER_URL != config.SOLANA_NODE || process.env.ANCHOR_WALLET == undefined) {
@@ -31,7 +31,7 @@ describe('Test init', async function () {
         }
 
         const AaveFlashLoanFactory = await ethers.getContractFactory('contracts/AaveFlashLoan/AaveFlashLoan.sol:AaveFlashLoan');
-        USDC = await hre.ethers.getContractAt('contracts/interfaces/IERC20.sol:IERC20', config.DATA.EVM.ADDRESSES.devUSDC);
+        USDC = await hre.ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', config.DATA.EVM.ADDRESSES.devUSDC);
 
         const neon_getEvmParamsRequest = await fetch("https://devnet.neonevm.org", {
             method: 'POST',

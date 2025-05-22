@@ -10,6 +10,7 @@ module.exports = {
             {
                 version: '0.8.28',
                 settings: {
+                    viaIR: true,
                     optimizer: {
                         enabled: true,
                         runs: 200,
@@ -53,9 +54,8 @@ module.exports = {
       accounts: [process.env.PRIVATE_KEY_OWNER],
       chainId: 245022926,
       allowUnlimitedContractSize: false,
-      gasMultiplier: 2,
-      maxFeePerGas: '10000000000000',
-      maxPriorityFeePerGas: '5000000000000'
+      gas: "auto",
+      gasPrice: "auto",
     },
     neonmainnet: {
       url: "https://neon-proxy-mainnet.solana.p2p.org",

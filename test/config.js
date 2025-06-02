@@ -1,4 +1,4 @@
-const web3 = require("@solana/web3.js");
+import web3 from "@solana/web3.js"
 
 const config = {
     SOLANA_NODE: 'https://api.devnet.solana.com',
@@ -28,7 +28,7 @@ const config = {
         }
     },
     utils: {
-        publicKeyToBytes32: function(pubkey) {
+        publicKeyToBytes32: function(ethers, pubkey) {
             return ethers.zeroPadValue(ethers.toBeHex(ethers.decodeBase58(pubkey)), 32);
         },
         addressToBytes32: function(address) {
@@ -71,17 +71,17 @@ const config = {
                 setTimeout(() => resolve(), timeout);
             })
         },
-        prepareInstructionAccounts: function(instruction, overwriteAccounts) {
+        prepareInstructionAccounts: function(ethers, instruction, overwriteAccounts) {
             let encodeKeys = '';
             for (let i = 0, len = instruction.keys.length; i < len; ++i) {
                 if (typeof(overwriteAccounts) != "undefined" && Object.hasOwn(overwriteAccounts, i)) {
-                    console.log(config.utils.publicKeyToBytes32(overwriteAccounts[i].key), 'publicKey');
-                    encodeKeys+= ethers.solidityPacked(["bytes32"], [config.utils.publicKeyToBytes32(overwriteAccounts[i].key)]).substring(2);
+                    console.log(config.utils.publicKeyToBytes32(ethers, overwriteAccounts[i].key), 'publicKey');
+                    encodeKeys+= ethers.solidityPacked(["bytes32"], [config.utils.publicKeyToBytes32(ethers, overwriteAccounts[i].key)]).substring(2);
                     encodeKeys+= ethers.solidityPacked(["bool"], [overwriteAccounts[i].isSigner]).substring(2);
                     encodeKeys+= ethers.solidityPacked(["bool"], [overwriteAccounts[i].isWritable]).substring(2);
                 } else {
-                    console.log(config.utils.publicKeyToBytes32(instruction.keys[i].pubkey.toString()), 'publicKey');
-                    encodeKeys+= ethers.solidityPacked(["bytes32"], [config.utils.publicKeyToBytes32(instruction.keys[i].pubkey.toString())]).substring(2);
+                    console.log(config.utils.publicKeyToBytes32(ethers, instruction.keys[i].pubkey.toString()), 'publicKey');
+                    encodeKeys+= ethers.solidityPacked(["bytes32"], [config.utils.publicKeyToBytes32(ethers, instruction.keys[i].pubkey.toString())]).substring(2);
                     encodeKeys+= ethers.solidityPacked(["bool"], [instruction.keys[i].isSigner]).substring(2);
                     encodeKeys+= ethers.solidityPacked(["bool"], [instruction.keys[i].isWritable]).substring(2);
                 }
@@ -89,7 +89,7 @@ const config = {
 
             return '0x' + ethers.zeroPadBytes(ethers.toBeHex(instruction.keys.length), 8).substring(2) + encodeKeys;
         },
-        prepareInstructionData: function(instruction) {
+        prepareInstructionData: function(ethers, instruction) {
             const packedInstructionData = ethers.solidityPacked( 
                 ["bytes"],
                 [instruction.data]
@@ -98,8 +98,8 @@ const config = {
 
             return '0x' + ethers.zeroPadBytes(ethers.toBeHex(instruction.data.length), 8).substring(2) + packedInstructionData;
         },
-        prepareInstruction: function(instruction) {
-            return config.utils.publicKeyToBytes32(instruction.programId.toBase58()) + config.utils.prepareInstructionAccounts(instruction).substring(2) + config.utils.prepareInstructionData(instruction).substring(2);
+        prepareInstruction: function(ethers, instruction) {
+            return config.utils.publicKeyToBytes32(ethers, instruction.programId.toBase58()) + config.utils.prepareInstructionAccounts(ethers, instruction).substring(2) + config.utils.prepareInstructionData(ethers, instruction).substring(2);
         },
         orcaHelper: {
             getParamsFromPools: function(
@@ -162,11 +162,7 @@ const config = {
 
             await config.utils.asyncTimeout(1000);
         },
-        asyncTimeout: async function(timeout) {
-            return new Promise((resolve) => {
-                setTimeout(() => resolve(), timeout);
-            })
-        }
     },
-};
-module.exports = { config };
+}
+
+export default config

@@ -1,21 +1,25 @@
-const { ethers } = require("hardhat");
-const web3 = require("@solana/web3.js");
-const {
+import { network } from "hardhat"
+import web3 from "@solana/web3.js"
+import {
     getAssociatedTokenAddress
-} = require('@solana/spl-token');
-const { AnchorProvider } = require("@coral-xyz/anchor");
-const { WhirlpoolContext, buildWhirlpoolClient, ORCA_WHIRLPOOL_PROGRAM_ID, PDAUtil, swapQuoteByInputToken, IGNORE_CACHE, WhirlpoolIx, SwapUtils } = require("@orca-so/whirlpools-sdk");
-const { DecimalUtil, Percentage } = require("@orca-so/common-sdk");
-const { Decimal } = require("decimal.js");
-const { config } = require('../config');
-const { createATA } = require('../CreateATAThroughSolanaWeb3');
-require("dotenv").config();
+} from "@solana/spl-token"
+import { AnchorProvider } from "@coral-xyz/anchor"
+import { WhirlpoolContext, buildWhirlpoolClient, ORCA_WHIRLPOOL_PROGRAM_ID, PDAUtil, swapQuoteByInputToken, IGNORE_CACHE, WhirlpoolIx, SwapUtils } from  "@orca-so/whirlpools-sdk"
+import { DecimalUtil, Percentage } from "@orca-so/common-sdk"
+import { Decimal } from "decimal.js"
+import config  from "../config"
+import createATA from "../CreateATAThroughSolanaWeb3"
+import { getSecrets } from "../../neon-secrets.js";
+import "dotenv/config"
 
 if (process.env.ANCHOR_PROVIDER_URL != config.SOLANA_NODE || process.env.ANCHOR_WALLET == undefined) {
-    return console.log('This script uses the @coral-xyz/anchor library which requires the variables ANCHOR_PROVIDER_URL and ANCHOR_WALLET to be set. Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_PROVIDER_URL='+config.SOLANA_NODE+' && export ANCHOR_WALLET=./id.json');
+    console.warn('This script uses the @coral-xyz/anchor library which requires the variables ANCHOR_PROVIDER_URL and ANCHOR_WALLET to be set. Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_PROVIDER_URL='+config.SOLANA_NODE+' && export ANCHOR_WALLET=./id.json');
+    throw new Error("Missing ANCHOR_PROVIDER_URL and ANCHOR_WALLET environment variables")
 }
 
+let ethers;
 let owner;
+let solanaUser;
 const AaveFlashLoanAddress = config.DATA.EVM.ADDRESSES.AAVE.AaveFlashLoanTest;
 let AaveFlashLoan;
 let USDC;
@@ -25,13 +29,16 @@ let neon_getEvmParams;
 
 describe('Test init', async function () {
     before(async function() {
-        [owner] = await ethers.getSigners();
+        const { wallets } = await getSecrets()
+        owner = wallets.owner;
+        solanaUser = wallets.solanaUser1
+        ethers = (await network.connect()).ethers
         if (await ethers.provider.getBalance(owner.address) == 0) {
             await config.utils.airdropNEON(owner.address);
         }
 
-        const AaveFlashLoanFactory = await ethers.getContractFactory('contracts/AaveFlashLoan/AaveFlashLoan.sol:AaveFlashLoan');
-        USDC = await hre.ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', config.DATA.EVM.ADDRESSES.devUSDC);
+        const AaveFlashLoanFactory = await ethers.getContractFactory('contracts/AaveFlashLoan/AaveFlashLoan.sol:AaveFlashLoan', owner);
+        USDC = await ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', config.DATA.EVM.ADDRESSES.devUSDC, owner);
 
         const neon_getEvmParamsRequest = await fetch("https://devnet.neonevm.org", {
             method: 'POST',
@@ -44,9 +51,12 @@ describe('Test init', async function () {
             console.log('\AaveFlashLoan used at', "\x1b[32m", AaveFlashLoanAddress, "\x1b[30m", '\n');
             AaveFlashLoan = AaveFlashLoanFactory.attach(AaveFlashLoanAddress);
         } else {
-            AaveFlashLoan = await ethers.deployContract('contracts/AaveFlashLoan/AaveFlashLoan.sol:AaveFlashLoan', [
-                config.DATA.EVM.ADDRESSES.AAVE.ADDRESS_PROVIDER
-            ]);
+            AaveFlashLoan = await ethers.deployContract(
+                'contracts/AaveFlashLoan/AaveFlashLoan.sol:AaveFlashLoan',
+                [
+                    config.DATA.EVM.ADDRESSES.AAVE.ADDRESS_PROVIDER
+                ],
+                owner);
             await AaveFlashLoan.waitForDeployment();
             console.log('\AaveFlashLoan deployed at', "\x1b[32m", AaveFlashLoan.target, "\x1b[30m", '\n');
         }
@@ -57,7 +67,7 @@ describe('Test init', async function () {
 
         console.log(ethers.encodeBase58(await USDC.tokenMint()), 'tokenMint');
 
-        await createATA(new web3.PublicKey(contractPublicKey));
+        await createATA(solanaUser, new web3.PublicKey(contractPublicKey));
     });
 
     describe('ERC20ForSPL tests', function() {
@@ -79,8 +89,8 @@ describe('Test init', async function () {
             tx = await AaveFlashLoan.flashLoanSimple(
                 config.DATA.EVM.ADDRESSES.devUSDC,
                 flashLoanRequestAmount,
-                config.utils.prepareInstruction(orcaSwapInstructions[0].instructions[0]),
-                config.utils.prepareInstruction(orcaSwapInstructions[1].instructions[0])
+                config.utils.prepareInstruction(ethers, orcaSwapInstructions[0].instructions[0]),
+                config.utils.prepareInstruction(ethers, orcaSwapInstructions[1].instructions[0])
             );
             await tx.wait(RECEIPTS_COUNT);
 

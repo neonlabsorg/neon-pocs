@@ -1,41 +1,37 @@
-const web3 = require("@solana/web3.js");
-const {
+import web3 from "@solana/web3.js"
+import {
     Raydium,
     TxVersion,
     Percent,
     DEV_CREATE_CPMM_POOL_PROGRAM,
     CREATE_CPMM_POOL_PROGRAM,
     CurveCalculator
-} = require("@raydium-io/raydium-sdk-v2");
-const {
+} from "@raydium-io/raydium-sdk-v2";
+import {
     NATIVE_MINT
-} = require("@solana/spl-token");
-const BN = require('bn.js');
-const Decimal = require('decimal.js');
-const { config } = require('../config');
-const bs58 = require("bs58");
-require("dotenv").config();
+} from "@solana/spl-token";
+import BN from "bn.js"
+import Decimal from "decimal.js"
+import config from "../config"
+import "dotenv/config";
 
 const connection = new web3.Connection(config.SOLANA_NODE, "processed");
 if (process.env.ANCHOR_WALLET == undefined) {
     console.error('Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_WALLET=./id.json');
     process.exit();
 }
-const keypair = web3.Keypair.fromSecretKey(
-    bs58.decode(process.env.PRIVATE_KEY_SOLANA)
-);
 
 const VALID_PROGRAM_ID = new Set([CREATE_CPMM_POOL_PROGRAM.toBase58(), DEV_CREATE_CPMM_POOL_PROGRAM.toBase58()])
 function isValidCpmm(id) {
     return VALID_PROGRAM_ID.has(id);
 }
 
-async function raydiumSwapInput(poolId) {
+async function raydiumSwapInput(solanaUser, poolId) {
     console.log('raydiumSwapInput', poolId);
 
     const raydium = await Raydium.load({
         connection,
-        owner: keypair, // key pair or publicKey, if you run a node process, provide keyPair
+        owner: solanaUser, // key pair or publicKey, if you run a node process, provide keyPair
         cluster: "devnet", // 'mainnet' | 'devnet'
         disableFeatureCheck: true,
         blockhashCommitment: "finalized",
@@ -64,7 +60,7 @@ async function raydiumSwapInput(poolId) {
     const slippage = new Percent(5, 100); // 5%
     const baseIn = inputMint === poolInfo.mintA.address;
 
-    const balance = await connection.getBalance(keypair.publicKey);
+    const balance = await connection.getBalance(solanaUser.publicKey);
     if (balance < uiInputAmount * 10 ** 9) {
         console.error('Not enough SOL balance. Needed', uiInputAmount, 'SOLs, having', balance);
         return;
@@ -92,7 +88,6 @@ async function raydiumSwapInput(poolId) {
     return;
 }
 
-module.exports = {
-    raydiumSwapInput
-};
+export default raydiumSwapInput
+
   

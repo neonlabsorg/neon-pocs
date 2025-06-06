@@ -25,7 +25,7 @@ export async function getSecrets() {
         usingPlainTextSecrets = await promptPlainTextSecretsWarning(envFileSecretKeys)
         if(!usingPlainTextSecrets) {
             // If user did not confirm using plain text secrets in .env file
-            throw new Error("User denied using plain text secrets from .env file")
+            throw new Error("Please remove plain text secrets from .env file before running Hardhat tests and scripts")
         }
     }
     try {

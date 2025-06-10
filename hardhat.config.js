@@ -5,6 +5,7 @@ import {
     listSecretsTask,
     deleteSecretTask,
     displayKeystoreFilePathTask,
+    isSecretSetTask,
     askPasswordTask,
     decryptSecretTask
 } from "./custom-tasks.js"
@@ -17,6 +18,7 @@ const config = {
         listSecretsTask,
         deleteSecretTask,
         displayKeystoreFilePathTask,
+        isSecretSetTask,
         askPasswordTask,
         decryptSecretTask
     ],

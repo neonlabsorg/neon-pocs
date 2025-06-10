@@ -1,6 +1,8 @@
 import hre from "hardhat"
 import web3 from "@solana/web3.js"
 import bs58 from "bs58"
+import fs from "fs"
+import { customKeystoreFilePath } from "./custom-tasks.js"
 import "dotenv/config"
 
 // Secret variables' keys
@@ -123,6 +125,11 @@ export async function getSecrets() {
 }
 
 export async function decryptSecret(ethers, secrets, secretKey, logs = true) {
+    // First check if keystore file has been created
+    await checkKeystoreExists()
+    // Then check if provided secretKey is registered in keystore file
+    await checkKeystoreSecretIsSet(secretKey)
+    
     if(logs) {
         console.log("\n ", "\u{1F512} \x1b[36mDecrypting keystore secret " + secretKey + "\x1b[0m\n")
     }
@@ -178,6 +185,8 @@ export async function decryptSecret(ethers, secrets, secretKey, logs = true) {
 }
 
 async function decryptSecrets(ethers) {
+    // First check if keystore file has been created
+    await checkKeystoreExists()
 
     console.log("\n ", "\u{1F512} \x1b[36mDecrypting keystore secrets...\x1b[0m\n")
 
@@ -235,6 +244,18 @@ function getSecretName(secretKey) {
     }
 
     return secretName
+}
+
+async function checkKeystoreExists() {
+    if(!fs.existsSync(customKeystoreFilePath(hre).keystore.filePath)) {
+        throw(new Error("\n\u{26A0} \x1b[33mNo keystore file found for project. Please set one up using \x1b[36mnpx hardhat keystore set {key}\x1b[0m"))
+    }
+}
+
+async function checkKeystoreSecretIsSet(secretKey) {
+    if(!(await hre.tasks.getTask("keystore").subtasks.get("contains").run({ key: secretKey }))) {
+        throw(new Error("\n\u{26A0}  \x1b[36m" + secretKey + "\x1b[33m key not found in project's keystore file. Please set it up using \x1b[36mnpx hardhat keystore set " + secretKey + "\x1b[0m"))
+    }
 }
 
 function asyncForLoop(iterable, asyncCallback, index, result) {

@@ -1,23 +1,19 @@
-const web3 = require("@solana/web3.js");
-const {
+import web3 from "@solana/web3.js"
+import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
     getAssociatedTokenAddressSync,
     TOKEN_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID
-} = require('@solana/spl-token');
-const bs58 = require("bs58");
-require("dotenv").config();
-const { config } = require('./config');
+} from "@solana/spl-token"
+import config from "./config"
+import "dotenv/config"
 
 const connection = new web3.Connection(config.SOLANA_NODE, "processed");
 if (process.env.ANCHOR_WALLET == undefined) {
     console.error('Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_WALLET=./id.json');
     process.exit();
 }
-const keypair = web3.Keypair.fromSecretKey(
-    bs58.decode(process.env.PRIVATE_KEY_SOLANA)
-);
 
 const defaultTokenMintsArray = [
     config.DATA.SVM.ADDRESSES.devSAMO,
@@ -25,9 +21,9 @@ const defaultTokenMintsArray = [
 ];
 let atasToBeCreated = '';
 
-async function createATA(publicKeys, tokenMintsArray) {
-    if (await connection.getBalance(keypair.publicKey) < 100000000) {
-        await config.utils.airdropSOL(keypair);
+async function createATA(solanaUser, publicKeys, tokenMintsArray) {
+    if (await connection.getBalance(solanaUser.publicKey) < 100000000) {
+        await config.utils.airdropSOL(solanaUser);
     }
 
     if (tokenMintsArray == undefined) {
@@ -52,7 +48,7 @@ async function createATA(publicKeys, tokenMintsArray) {
 
                 transaction.add(
                     createAssociatedTokenAccountInstruction(
-                        keypair.publicKey,
+                        solanaUser.publicKey,
                         associatedToken,
                         publicKeys[i],
                         new web3.PublicKey(tokenMintsArray[y]), 
@@ -75,7 +71,7 @@ async function createATA(publicKeys, tokenMintsArray) {
         const signature = await web3.sendAndConfirmTransaction(
             connection,
             transaction,
-            [keypair]
+            [solanaUser]
         );
 
         console.log('\nTx signature', signature);
@@ -85,6 +81,4 @@ async function createATA(publicKeys, tokenMintsArray) {
     }
 } 
 
-module.exports = {
-    createATA
-};
+export default createATA

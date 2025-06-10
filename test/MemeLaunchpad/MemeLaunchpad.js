@@ -1,12 +1,14 @@
-const { ethers } = require("hardhat");
-const { expect } = require("chai");
-const web3 = require("@solana/web3.js");
-const { config } = require('../config');
-const { raydiumSwapInput } = require('./raydiumSwapInput');
-const { createATA } = require('../CreateATAThroughSolanaWeb3');
-require("dotenv").config();
+import { network } from "hardhat"
+import web3 from "@solana/web3.js"
+import { expect } from "chai"
+import config  from "../config"
+import createATA from "../CreateATAThroughSolanaWeb3"
+import raydiumSwapInput from "./raydiumSwapInput"
+import { getSecrets } from "../../neon-secrets.js"
 
+let ethers;
 let owner;
+let solanaUser;
 const MemeLaunchpadAddress = config.DATA.EVM.ADDRESSES.MemeLaunchpad.MemeLaunchpadTest;
 const BondingCurveAddress = config.DATA.EVM.ADDRESSES.MemeLaunchpad.BondingCurve;
 let MemeLaunchpad;
@@ -19,15 +21,18 @@ const RECEIPTS_COUNT = 1;
 
 describe('Test init', async function () {
     before(async function() {
-        [owner] = await ethers.getSigners();
+        const { wallets } = await getSecrets()
+        owner = wallets.owner;
+        solanaUser = wallets.solanaUser1
+        ethers = (await network.connect()).ethers
         if (await ethers.provider.getBalance(owner.address) == 0) {
             console.error('Deployer has 0 NEON balance, please grab some at https://neonfaucet.org/.');
             process.exit();
         }
 
-        const MemeLaunchpadFactory = await ethers.getContractFactory('contracts/MemeLaunchpad/MemeLaunchpad.sol:MemeLaunchpad');
-        const BondingCurveFactory = await ethers.getContractFactory('contracts/MemeLaunchpad/BondingCurve.sol:BondingCurve');
-        WSOL = await hre.ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', config.DATA.EVM.ADDRESSES.WSOL);
+        const MemeLaunchpadFactory = await ethers.getContractFactory('contracts/MemeLaunchpad/MemeLaunchpad.sol:MemeLaunchpad', owner);
+        const BondingCurveFactory = await ethers.getContractFactory('contracts/MemeLaunchpad/BondingCurve.sol:BondingCurve', owner);
+        WSOL = await ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', config.DATA.EVM.ADDRESSES.WSOL, owner);
 
         if (ethers.isAddress(BondingCurveAddress)) {
             console.log('\BondingCurve used at', "\x1b[32m", BondingCurveAddress, "\x1b[30m", '\n');
@@ -46,12 +51,16 @@ describe('Test init', async function () {
             console.log('\MemeLaunchpad used at', "\x1b[32m", MemeLaunchpadAddress, "\x1b[30m", '\n');
             MemeLaunchpad = MemeLaunchpadFactory.attach(MemeLaunchpadAddress);
         } else {
-            MemeLaunchpad = await ethers.deployContract('contracts/MemeLaunchpad/MemeLaunchpad.sol:MemeLaunchpad', [
-                config.DATA.EVM.ADDRESSES.ERC20ForSplFactory,
-                BondingCurve.target,
-                WSOL.target,
-                100 // 1% fee
-            ]);
+            MemeLaunchpad = await ethers.deployContract(
+                'contracts/MemeLaunchpad/MemeLaunchpad.sol:MemeLaunchpad',
+                [
+                    config.DATA.EVM.ADDRESSES.ERC20ForSplFactory,
+                    BondingCurve.target,
+                    WSOL.target,
+                    100 // 1% fee
+                ],
+                owner
+            );
             await MemeLaunchpad.waitForDeployment();
             console.log('\MemeLaunchpad deployed at', "\x1b[32m", MemeLaunchpad.target, "\x1b[30m", '\n');
         }
@@ -72,10 +81,11 @@ describe('Test init', async function () {
             let receipt = await tx.wait(RECEIPTS_COUNT);
             console.log(tx.hash, 'createTokenSale tx');
 
-            Token = await hre.ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', receipt.logs[2].args[0]);
+            Token = await ethers.getContractAt('contracts/interfaces/IERC20ForSpl.sol:IERC20ForSpl', receipt.logs[2].args[0], owner);
 
             // setup contract's payer ATA accounts for both tokens ( payer account is the one who creates the Raydium pool )
             await createATA(
+                solanaUser,
                 [
                     new web3.PublicKey(ethers.encodeBase58(payer))
                 ],
@@ -160,7 +170,7 @@ describe('Test init', async function () {
             expect(await WSOL.balanceOf(owner.address)).to.be.greaterThan(wsolBalance);
             
             // collect Raydium locked LP fee
-            await raydiumSwapInput(ethers.encodeBase58(poolId)); // fake some swap in order to be able to collect some fees
+            await raydiumSwapInput(solanaUser, ethers.encodeBase58(poolId)); // fake some swap in order to be able to collect some fees
             await config.utils.asyncTimeout(10000);
 
             const initialTokenABalance = await WSOL.balanceOf(owner.address);

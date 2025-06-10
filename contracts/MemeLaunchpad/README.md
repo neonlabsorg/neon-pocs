@@ -5,4 +5,7 @@ The following POC aims to validate that it's possible to build MemeLaunchpad pro
 * Collecting fees generated from Raydium's pool activity - [https://devnet.neonscan.org/tx/0xfde57881cd5f0d9f1d487dfc4755f85993b6f3c0803802c31656b750a0ddb1be](https://devnet.neonscan.org/tx/0xfde57881cd5f0d9f1d487dfc4755f85993b6f3c0803802c31656b750a0ddb1be)
 
 ### Run the POC
-* ```npx hardhat test test/MemeLaunchpad/MemeLaunchpad.js --network neondevnet```
+* ```npx hardhat test mocha test/MemeLaunchpad/MemeLaunchpad.js --network neondevnet```
+### Secret values setup
+
+See detailed [instructions](../../README.md) for setting up secret values (such as private keys) used to run tests.

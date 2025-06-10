@@ -5,6 +5,10 @@ The following POC aims to validate that it's possible to request a flash loan fr
 * Sample transaction - [https://neon-devnet.blockscout.com/tx/0x5d4a2c7aefebd85f7fc2c726f81496953655238125b7efc535c9efa6189ce8c0](https://neon-devnet.blockscout.com/tx/0x5d4a2c7aefebd85f7fc2c726f81496953655238125b7efc535c9efa6189ce8c0)
 
 ### Run the POC
-* ```npx hardhat test test/AaveFlashLoan/AaveFlashLoan.js --network neondevnet```
+* ```npx hardhat test mocha test/AaveFlashLoan/AaveFlashLoan.js --network neondevnet```
 
 ![alt text](https://github.com/neonlabsorg/neon-pocs/blob/master/contracts/AaveFlashLoan/Flashloan_Infographic.png)
+
+### Secret values setup
+
+See detailed [instructions](../../README.md) for setting up secret values (such as private keys) used to run tests.

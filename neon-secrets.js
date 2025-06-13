@@ -9,7 +9,9 @@ import "dotenv/config"
 const keystorePasswordKey = "KEYSTORE_PASSWORD"
 const secretsKeys = [
     "PRIVATE_KEY_OWNER",
-    "PRIVATE_KEY_SOLANA"
+    "PRIVATE_KEY_USER_1",
+    "PRIVATE_KEY_SOLANA",
+    "PRIVATE_KEY_SOLANA_2"
 ]
 
 export async function getSecrets() {

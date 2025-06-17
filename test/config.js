@@ -2,6 +2,7 @@ import web3 from "@solana/web3.js"
 
 const config = {
     SOLANA_NODE: 'https://api.devnet.solana.com',
+    SOLANA_NODE_MAINNET: 'https://api.mainnet-beta.solana.com/',
     DATA: {
         EVM: {
             ADDRESSES: {

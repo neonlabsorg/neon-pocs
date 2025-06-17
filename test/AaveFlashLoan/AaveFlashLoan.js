@@ -8,7 +8,7 @@ import { WhirlpoolContext, buildWhirlpoolClient, ORCA_WHIRLPOOL_PROGRAM_ID, PDAU
 import { DecimalUtil, Percentage } from "@orca-so/common-sdk"
 import { Decimal } from "decimal.js"
 import config  from "../config"
-import createATA from "../CreateATAThroughSolanaWeb3"
+import createATA from "../helpers/CreateATAThroughSolanaWeb3"
 import { getSecrets } from "../../neon-secrets.js";
 import "dotenv/config"
 

@@ -51,9 +51,11 @@
     "@metaplex-foundation/js": "^0.20.1",
     "@neonevm/token-transfer-core": "^4.4.2",
     "@neonevm/token-transfer-ethers": "^4.4.2",
+    "@pump-fun/pump-swap-sdk": "^0.0.1-beta.36",
     "@raydium-io/raydium-sdk-v2": "^0.1.117-alpha",
     "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.98.0",
+    "cross-fetch": "^4.1.0",
     "decimal.js": "^10.4.3",
     "solady": "^0.1.10",
     "solidity-docgen": "^0.6.0-beta.36"

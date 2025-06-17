@@ -6,7 +6,7 @@ import {
     TOKEN_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID
 } from "@solana/spl-token"
-import config from "./config"
+import config from "../config"
 import "dotenv/config"
 
 const connection = new web3.Connection(config.SOLANA_NODE, "processed");
@@ -21,8 +21,12 @@ const defaultTokenMintsArray = [
 ];
 let atasToBeCreated = '';
 
-async function createATA(solanaUser, publicKeys, tokenMintsArray) {
-    if (await connection.getBalance(solanaUser.publicKey) < 100000000) {
+async function createATA(solanaUser, publicKeys, tokenMintsArray, connectionParam) {
+    if (connectionParam == undefined) {
+        connectionParam = connection;
+    }
+
+    if (await connectionParam.getBalance(solanaUser.publicKey) < 100000000) {
         await config.utils.airdropSOL(solanaUser);
     }
 
@@ -30,6 +34,7 @@ async function createATA(solanaUser, publicKeys, tokenMintsArray) {
         tokenMintsArray = defaultTokenMintsArray;
     }
     const transaction = new web3.Transaction();
+    console.log(tokenMintsArray, 'tokenMintsArray');
 
     for (let i = 0, len = publicKeys.length; i < len; ++i) {
         for (let y = 0, leny = tokenMintsArray.length; y < leny; ++y) {
@@ -40,7 +45,7 @@ async function createATA(solanaUser, publicKeys, tokenMintsArray) {
                 TOKEN_PROGRAM_ID, 
                 ASSOCIATED_TOKEN_PROGRAM_ID
             );
-            const ataInfo = await connection.getAccountInfo(associatedToken);
+            const ataInfo = await connectionParam.getAccountInfo(associatedToken);
 
             // create ATA only if it's missing
             if (!ataInfo || !ataInfo.data) {
@@ -69,7 +74,7 @@ async function createATA(solanaUser, publicKeys, tokenMintsArray) {
     if (transaction.instructions.length) {
         console.log('\nCreating ATA accounts for the following SPLTokens - ', atasToBeCreated.substring(0, atasToBeCreated.length - 2));
         const signature = await web3.sendAndConfirmTransaction(
-            connection,
+            connectionParam,
             transaction,
             [solanaUser]
         );

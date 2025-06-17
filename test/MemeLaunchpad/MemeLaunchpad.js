@@ -2,7 +2,7 @@ import { network } from "hardhat"
 import web3 from "@solana/web3.js"
 import { expect } from "chai"
 import config  from "../config"
-import createATA from "../CreateATAThroughSolanaWeb3"
+import createATA from "../helpers/CreateATAThroughSolanaWeb3"
 import raydiumSwapInput from "./raydiumSwapInput"
 import { getSecrets } from "../../neon-secrets.js"
 

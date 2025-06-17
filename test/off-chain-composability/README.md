@@ -1,7 +1,7 @@
 # PoCs validating composability with off-chain generated Solana instructions
 
 ## Commands:
-* **Jupiter swap** - ```npx hardhat test mocha test/off-chain-composability/TestPumpFunSwap.js --network neonmainnet```
+* **Jupiter swap** - ```npx hardhat test mocha test/off-chain-composability/TestJupiterSwap.js --network neonmainnet```
 * **PumpFun swap** - ```npx hardhat test mocha test/off-chain-composability/TestRaydiumCLMMSwap.js --network neonmainnet```
 * **Raydium CLMM swap** - ```npx hardhat test mocha test/off-chain-composability/TestPumpFunSwap.js --network neonmainnet```
 

@@ -1,57 +1,51 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-// import { CallSolanaHelperLib } from '../utils/CallSolanaHelperLib.sol';
-// import { Constants } from "./libraries/Constants.sol";
+import { CallSolanaHelperLib } from './utils/CallSolanaHelperLib.sol';
 import { LibSystemData } from "./libraries/system-program/LibSystemData.sol";
-// import { LibSystemProgram } from "./libraries/system-program/LibSystemProgram.sol";
+import { LibSystemProgram } from "./libraries/system-program/LibSystemProgram.sol";
+import { Constants } from "./libraries/Constants.sol";
 
 import { ICallSolana } from './precompiles/ICallSolana.sol';
 
-/// @title CallPumpFunProgram
+/// @title CallRaydiumProgram
 /// @author maxpolizzo@gmail.com
-contract CallPumpFunProgram {
+contract CallRaydiumProgram {
     ICallSolana public constant CALL_SOLANA = ICallSolana(0xFF00000000000000000000000000000000000006);
 
     event LogData(bytes response);
     event CreateResource(bytes32 salt, uint64 space, uint64 lamports, bytes32 programId, bytes32 response);
 
-/*
-    function createAccountWithSeed(
-        bytes32 programId,
-        bytes memory seed,
-        uint64 accountSize
+    function transferSOL(
+        bytes32 recipient,
+        uint64 amount
     ) external {
+        // Payer account will pay the SOL amount while msg.sender will pay gas fees covering that amount plus
+        // transaction fees
         bytes32 payer = CALL_SOLANA.getPayer();
-        bytes32 basePubKey = CALL_SOLANA.getNeonAddress(address(this));
 
-        // Format createAccountWithSeed instruction
+        // Format transfer instruction
         (   bytes32[] memory accounts,
             bool[] memory isSigner,
             bool[] memory isWritable,
-            bytes memory data,
-            uint64 rentExemptionBalance
-        ) = LibSystemProgram.formatCreateAccountWithSeedInstruction(
+            bytes memory data
+        ) = LibSystemProgram.formatTransferInstruction(
             payer,
-            basePubKey,
-            programId,
-            seed,
-            accountSize
+            recipient,
+            amount
         );
-        // Prepare createAccountWithSeed instruction
-        bytes memory createAccountWithSeedIx = CallSolanaHelperLib.prepareSolanaInstruction(
+        // Prepare transfer instruction
+        bytes memory transferIx = CallSolanaHelperLib.prepareSolanaInstruction(
             Constants.getSystemProgramId(),
             accounts,
             isSigner,
             isWritable,
             data
         );
-        // Execute createAccountWithSeed instruction
-        // Neon proxy operator is asked to send the SOL amount equal to rentExemptionBalance with the transaction in
-        // order to fund the created account
-        CALL_SOLANA.execute(rentExemptionBalance, createAccountWithSeedIx);
+        // Execute transfer instruction, sending amount lamports
+        CALL_SOLANA.execute(amount, transferIx);
     }
-*/
+
     function createResource(
         bytes32 salt,
         uint64 space,

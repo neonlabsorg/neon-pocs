@@ -230,11 +230,13 @@ export async function execute(
             "0x0000000000000000000000000000000000000000000000000000000000000000";
     }
 
+    console.log("\nExecuting with salt: ", salt)
+
     const tx = await contractInstance
         .connect(msgSender)
-        .execute(lamports, salt, prepareInstruction(instruction)); //, { gasLimit: 100000000 });
+        .execute(lamports, salt, prepareInstruction(instruction)) // , { gasLimit: 100000000 });
 
-    const receipt = await tx.wait(3);
+    const receipt = await tx.wait(1);
     return [tx, receipt];
 }
 

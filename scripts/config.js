@@ -31,7 +31,12 @@ const config = {
         },
         CallPumpFunProgram: {
             curvestand: "",
-            neondevnet: "",
+            neondevnet: "0x7a35ce670141D7AB8f69B0319CE78572eDdab421",
+            neonmainnet: "",
+        },
+        CallRaydiumProgram: {
+            curvestand: "",
+            neondevnet: "0x9A18756D8ACB5cf55140febbdeF5363332f7BD04",
             neonmainnet: "",
         }
     }

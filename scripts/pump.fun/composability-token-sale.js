@@ -29,24 +29,21 @@ const payerPublicKey = new web3.PublicKey(ethers.encodeBase58(await callPumpFunP
 console.log(payerPublicKey, 'payerPublicKey')
 const neonEVMProgramId = new web3.PublicKey('eeLSJgWzzxrqKv1UxtRVVH8FX3qCQWUs9QuAjJpETGU')
 
-/*
-const seed = 'seed' + Date.now().toString(); // random seed on each script call
-const mintPublicKey = new web3.PublicKey(ethers.encodeBase58(await callPumpFunProgram.getCreateWithSeedAccount(
-    contractPublicKey.toBuffer(), // basePubKey
-    neonEVMProgramId.toBuffer(), // owner program
-    Buffer.from(seed)
-)))
-*/
-const salt = web3.Keypair.generate().publicKey.toBuffer()
 
-const mintPublicKey = new web3.PublicKey(ethers.encodeBase58(await callPumpFunProgram.getResourceAddress(
-     salt // salt
-)))
+const salt = Buffer.from(ethers.toBeHex(Date.now(), 32).slice(2), 'hex'); // random salt on each script call
+console.log(salt, 'salt')
+const mintPublicKey = new web3.PublicKey(ethers.encodeBase58((await callPumpFunProgram.getCreateWithSeedAccount(
+    contractPublicKey.toBuffer(), // also tried with payerPublicKey.toBuffer(),
+    web3.SystemProgram.programId.toBuffer(), // also tried with neonEVMProgramId.toBuffer(),
+    salt
+))))
+
+// const mintPublicKey = new web3.PublicKey(ethers.encodeBase58((await callPumpFunProgram.getResourceAddress(salt))))
+// const mintPublicKey = new web3.PublicKey(ethers.encodeBase58((await callPumpFunProgram.getExtAuthority(salt))))
+
 console.log(mintPublicKey, 'mintPublicKey')
 
-
 // Deploy SPL token and bonding curve
-const randomPubKey = await web3.Keypair.generate()
 const createIx = await pumpSdk.createInstruction(
     mintPublicKey, // mint public key (must be signer)
     "Test",
@@ -55,14 +52,14 @@ const createIx = await pumpSdk.createInstruction(
     contractPublicKey, // creator public key (must be signer)
     contractPublicKey, // user public key
 )
-console.log(createIx)
+console.log(createIx, 'createIx')
 
 console.log('Broadcasting Pump.fun create instruction via NeonEVM composability')
 let [tx, receipt] = await execute(
     createIx,
     100000000,
     callPumpFunProgram,
-    undefined,
+    salt,
     wallets.user1
 );
 console.log(tx, 'tx');

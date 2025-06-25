@@ -12,6 +12,7 @@ import { useProxyConnection } from '../wallet/Connection';
 import { FormState, CheckInData, CheckInResponse } from '../models';
 import './SwapForm.css';
 import { addressesDevnet } from '../data/addresses.devnet';
+import { getTotalCheckIns } from '../api/checkIn.ts';
 
 const DURATION = 3e5;
 const DELAY = 1e3;
@@ -29,6 +30,8 @@ export const SwapForm = (props: Props) => {
   const [transactionStates, setTransactionStates] = useState<FormState[]>([]);
   const transactionsRef = useRef<FormState[]>([]);
   const [error, setError] = useState<string>(``);
+  const [checkIns, setCheckIns] = useState<string[]>([]);
+  const [loadingCheckIns, setLoadingCheckIns] = useState(false);
 
   const changeTransactionStates = (state: FormState): void => {
     setTransactionStates((prev) =>
@@ -124,7 +127,7 @@ export const SwapForm = (props: Props) => {
   const executeTransactionsStates = async (transactionStates: FormState[]): Promise<void> => {
     for (let i = 0; i < transactionStates.length; i++) {
       const state = transactionStates[i];
-      if (i > 0 && ['Failed', 'Skipped', 'NoStarted'].includes(transactionStates[i - 1].status)) {
+      if (i > 0 && ['Failed', 'Skipped', 'NotStarted'].includes(transactionStates[i - 1].status)) {
         break;
       } else {
         log(`Run transaction ${state.title}`);
@@ -148,7 +151,28 @@ export const SwapForm = (props: Props) => {
       transactionsRef.current = [swapTokensState];
       addTransactionStates(transactionsRef.current);
       await executeTransactionsStates(transactionsRef.current);
-      setLoading(false);
+
+      // 🆕 If all succeeded, call getTotalCheckIns function
+      const allSuccess = transactionsRef.current.every((s) => s.status === 'Success');
+      if (allSuccess) {
+        setLoadingCheckIns(true); // Show loader
+        const params: CheckInData = {
+          nonce: Number(await proxyApi.getTransactionCount(solanaUser.neonWallet)),
+          proxyApi,
+          provider,
+          connection,
+          solanaUser,
+          neonEvmProgram,
+          checkIn: addressesDevnet.checkIn.checkIn,
+          chainId
+        };
+        const totalCheckIns = await getTotalCheckIns(params); // 👈 call your method
+
+        // Set to state (assuming totalCheckIns is a string[] or string[] of timestamps)
+        setCheckIns(totalCheckIns);
+        setLoadingCheckIns(false); // Hide loader
+        setLoading(false);
+      }
     } catch (e: any) {
       log(e.message);
       if (transactionsRef.current.some((i) => !i.data)) {
@@ -179,6 +203,33 @@ export const SwapForm = (props: Props) => {
           </div>
         </div>
       )}
+      {/* Show message if ALL states are successful */}
+      {loadingCheckIns && (
+        <div className='form-group'>
+          <div className='form-field'>
+            <img
+              src='/assets/icons/loading.svg' // or a GIF or external loader image
+              alt='Loading...'
+              className='mx-auto h-8 w-8 animate-spin'
+            />
+          </div>
+        </div>
+      )}
+      {transactionStates.length > 0 &&
+        transactionStates.every((state) => state.status === 'Success') &&
+        checkIns.length > 0 &&
+        !loadingCheckIns && (
+          <div className='form-group'>
+            <div className='form-field'>
+              <p className='text-success'>Total Check Ins:</p>
+              <ul>
+                {checkIns.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       {error.length > 0 && <div className='form-error'>{error}</div>}
       <div className='form-group'>
         <div className='form-field'>

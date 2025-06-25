@@ -7,7 +7,7 @@ import FormTabs from '../swap/components/FormTabs/FormTabs.tsx';
 import { useProxyConnection } from '../wallet/Connection.tsx';
 import { CheckInData } from '../models';
 import './App.css';
-import { checkIn } from '../api/checkIn.ts';
+import { checkIn, getTotalCheckIns } from '../api/checkIn.ts';
 
 function App() {
   const { publicKey } = useWallet();

@@ -12,15 +12,13 @@ import { network } from "hardhat";
 
 let ethers;
 let owner;
-let CheckInAddress = ""; // Replace this with the deployed contract address after running the script for the 1st time
+let CheckInAddress = "0x70A3e9fE5Ba7C88dFC05317e795a43d149c80793"; // Replace this with your deployed contract address
 let CheckIn;
 
 async function main() {
   const { wallets } = await getSecrets();
   owner = wallets.owner;
-  console.log("User wallet:", owner);
   const solanaUserKeypair = wallets.solanaUser1;
-  console.log("Solana wallet:", solanaUserKeypair);
   ethers = (await network.connect()).ethers;
 
   const CheckInFactory = await ethers.getContractFactory(
@@ -59,10 +57,7 @@ async function main() {
   );
   const proxyApi = new NeonProxyRpcApi("https://devnet.neonevm.org/sol");
 
-  /*const solanaPrivateKey = bs58.decode(process.env.SOLANA_PRIVATE_KEY);
-  const keypair = Keypair.fromSecretKey(solanaPrivateKey);*/
-  const { chainId, solanaUser, provider, programAddress, tokenMintAddress } =
-    await proxyApi.init(solanaUserKeypair);
+  const { solanaUser } = await proxyApi.init(solanaUserKeypair);
   await solanaAirdrop(connection, solanaUser.publicKey, 1e9);
 
   console.log("\nNeon wallet address:", solanaUser.neonWallet);

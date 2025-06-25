@@ -33,10 +33,10 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         return CALL_SOLANA.getPayer();
     }
 
+    // request flash loan from Aave V3 protocol
     function flashLoanSimple(address token, uint256 amount, bytes memory instructionData1, bytes memory instructionData2) public {
         bytes memory params = abi.encode(instructionData1, instructionData2);
 
-        // request flash loan from Aave V3 protocol
         POOL.flashLoanSimple(
             address(this),
             token,
@@ -46,6 +46,7 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         );
     }
 
+    // Cqllback to be called by Aave V3 to provide us with the flash loan
     function executeOperation(
         address asset,
         uint256 amount,
@@ -72,8 +73,8 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
 
         (bytes memory instructionData1, bytes memory instructionData2) = abi.decode(params, (bytes, bytes));
 
-        CALL_SOLANA.execute(0, instructionData1); // Request Raydium's program on Solana to swap $USDC for $SAMO
-        CALL_SOLANA.execute(0, instructionData2); // Request Raydium's program on Solana to swap back $SAMO for $USDC
+        CALL_SOLANA.execute(0, instructionData1); // Request Orca's program on Solana to swap $USDC for $SAMO
+        CALL_SOLANA.execute(0, instructionData2); // Request Orca's program on Solana to swap back $SAMO for $USDC
 
         // approval to return back the flashloan + the fee
         IErc20ForSpl(asset).approve(address(POOL), amount + premium);

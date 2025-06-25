@@ -10,10 +10,6 @@ import config from "../config"
 import "dotenv/config"
 
 const connection = new web3.Connection(config.SOLANA_NODE, "processed");
-if (process.env.ANCHOR_WALLET == undefined) {
-    console.error('Please create id.json in the root of the hardhat project with your Solana\'s private key and run the following command in the terminal in order to proceed with the script execution: \n\n export ANCHOR_WALLET=./id.json');
-    process.exit();
-}
 
 const defaultTokenMintsArray = [
     config.DATA.SVM.ADDRESSES.devSAMO,

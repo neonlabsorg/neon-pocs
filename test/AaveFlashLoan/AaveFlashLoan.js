@@ -67,7 +67,7 @@ describe('Test init', async function () {
 
         console.log(ethers.encodeBase58(await USDC.tokenMint()), 'tokenMint');
 
-        await createATA(solanaUser, new web3.PublicKey(contractPublicKey));
+        await createATA(solanaUser, [new web3.PublicKey(contractPublicKey)]);
     });
 
     describe('ERC20ForSPL tests', function() {

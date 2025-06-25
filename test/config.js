@@ -12,7 +12,7 @@ const config = {
                 },
                 ERC20ForSplFactory: '0xF6b17787154C418d5773Ea22Afc87A95CAA3e957',
                 AAVE: {
-                    AaveFlashLoanTest: '0x1f464349eEAC5DbAD27c38cCe222d4D28bAc0824',
+                    AaveFlashLoanTest: '0x90cF15326EE0Ecd1849685F28Ac70BEcA10248E0',
                     AAVE_POOL: '0x9eA85823b7B736189e663ddef0FEE250EF0d23E1', // Pool-Proxy-Aave.json
                     ADDRESS_PROVIDER: '0x3792F5eD078EEbE34419627E91D648e8Ac3C56e5'
                 },

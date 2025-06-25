@@ -1,15 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
-import '../precompiles/ICallSolana.sol';
-import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
-import "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
-
-interface IErc20ForSpl {
-    function transferSolana(bytes32 to, uint64 amount) external returns (bool);
-    function approve(address spender, uint256 value) external returns (bool);
-    function tokenMint() external view returns (bytes32);
-}
+import { ICallSolana } from '../precompiles/ICallSolana.sol';
+import { IERC20ForSpl } from '../interfaces/IERC20ForSpl.sol';
+import { FlashLoanSimpleReceiverBase } from "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
+import { IPoolAddressesProvider } from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
 
 
 /// @title AaveFlashLoan
@@ -46,7 +41,7 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         );
     }
 
-    // Cqllback to be called by Aave V3 to provide us with the flash loan
+    // Callback to be called by Aave V3 to provide the smart contract with the flashloan earlier requested
     function executeOperation(
         address asset,
         uint256 amount,
@@ -55,17 +50,19 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         bytes calldata params
     )  external override returns (bool) {
         require(msg.sender == address(POOL), "ERROR: AUTH - INVALID POOL");
+        require(initiator == address(this), "ERROR: AUTH - INVALID INITIATOR");
+
         lastLoan = amount;
         lastLoanFee = premium;
 
         // move flash loan amount to contract's ATA
-        IErc20ForSpl(asset).transferSolana(
+        IERC20ForSpl(asset).transferSolana(
             CALL_SOLANA.getSolanaPDA(
                 ASSOCIATED_TOKEN_PROGRAM,
                 abi.encodePacked(
                     CALL_SOLANA.getNeonAddress(address(this)), 
                     TOKEN_PROGRAM,
-                    IErc20ForSpl(asset).tokenMint()
+                    IERC20ForSpl(asset).tokenMint()
                 )
             ),
             uint64(amount)
@@ -76,8 +73,8 @@ contract AaveFlashLoan is FlashLoanSimpleReceiverBase {
         CALL_SOLANA.execute(0, instructionData1); // Request Orca's program on Solana to swap $USDC for $SAMO
         CALL_SOLANA.execute(0, instructionData2); // Request Orca's program on Solana to swap back $SAMO for $USDC
 
-        // approval to return back the flashloan + the fee
-        IErc20ForSpl(asset).approve(address(POOL), amount + premium);
+        // approval to return back the $USDC flashloan + the small fee charged by Aave
+        IERC20ForSpl(asset).approve(address(POOL), amount + premium);
         return true;
     }
 }

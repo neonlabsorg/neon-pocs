@@ -1,0 +1,10 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.wallet-adapter-button {
+  padding-left: 10px!important;
+  padding-right: 10px!important;
+  height: 36px!important;
+}

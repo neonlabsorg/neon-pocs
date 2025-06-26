@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+.form-group {
+  @apply p-6 bg-[#161B26] rounded-lg mb-[20px];
+
+  &:last-of-type {
+    @apply mb-0;
+  }
+}
+
+.form-error {
+  @apply p-6 bg-[#F04438] text-white rounded-lg mb-[20px] max-w-full;
+
+  &:last-of-type {
+    @apply mb-0;
+  }
+}
+
+.form-label {
+  @apply flex flex-row justify-between text-[16px] font-bold mb-[2px];
+}
+
+.wallet-amount {
+  @apply flex flex-row gap-[4px] text-[16px] font-bold mb-[2px] items-center;
+}
+
+.form-button {
+  @apply flex flex-col justify-center items-center w-full leading-[24px] h-[48px] px-[20px] rounded-[8px] text-center text-[20px] text-[#fff] transition-all cursor-pointer;
+  background: #7F56D9;
+  &:hover {
+    background: linear-gradient(91.79deg, #BA3CD9 59.46%, #F77137 101.11%);
+  }
+  &[disabled] {
+    @apply text-[#3F3A46] cursor-default;
+    background: #1C1920;
+  }
+}
+
+.form-divider {
+  @apply flex flex-col justify-center items-center relative;
+
+  &:before {
+    content: '';
+    @apply absolute left-[-20px] right-[-20px] top-[50%] border-1 border-[#1F242F];
+  }
+}
+
+.switch-tokens {
+  @apply bg-[#0C111D] flex flex-row justify-center items-center p-[8px] rounded-[8px] border-1 border-[#1F242F] relative cursor-pointer;
+  z-index: 1;
+
+  &:hover {
+    @apply bg-[#0C111DAA];
+  }
+}
+
+.button-group {
+  @apply flex flex-row gap-[8px];
+  .button {
+    @apply inline-flex flex-col justify-center items-center leading-[24px] h-[36px] rounded-[8px] transition-all cursor-pointer;
+    @apply text-center text-[20px] text-[#fff] bg-[#0C111D] py-[4px] px-[16px];
+    &.active, &:hover {
+      @apply bg-[#333741];
+    }
+    &[disabled] {
+      @apply bg-[#0C111D] cursor-default;
+      opacity: 0.5;
+    }
+  }
+}

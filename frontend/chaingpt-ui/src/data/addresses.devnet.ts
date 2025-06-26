@@ -95,6 +95,6 @@ export const addressesDevnet = {
     neonTokenTransfer: '0xA4C62831B47C0Bb3a0cF569B7a22A41749a48ED7'
   },
   checkIn: {
-    checkIn: '0x70A3e9fE5Ba7C88dFC05317e795a43d149c80793'
+    checkIn: '0xA927F387108F6789e9F9CAc130359fa2E4141761'
   }
 };

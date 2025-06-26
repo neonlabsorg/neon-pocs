@@ -1,8 +1,8 @@
 {
   "display": "standalone",
-  "description": "The Neon Solana Native Swap Demo is a service for performing token swap in Neon EVM via Solana signer library.",
-  "name": "Neon Solana Native Swap Demo",
-  "short_name": "NeonSolanaNativeSwapDemo",
+  "description": "ChainGPT Demo in Neon EVM via Solana signer library.",
+  "name": "ChainGPT CheckIn Demo",
+  "short_name": "ChainGPTCheckInDemo",
   "start_url": ".",
   "theme_color": "#0C111D",
   "background_color": "#0C111D",

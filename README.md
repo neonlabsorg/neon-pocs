@@ -3,6 +3,10 @@
 1. [Aave V3 flash loan with composability requests to Solana](./contracts/AaveFlashLoan)
 2. [MemeLaunchpad with composability requests to Solana](./contracts/MemeLaunchpad)
 
+> [!NOTE]
+> This repository includes Hardhat 3 which requires the support of Node.js v22 or later installed on your system, along 
+> with a package manager such as npm or pnpm.
+
 ### Secret values setup
 Secret values (such as private keys) used in tests and scripts should be stored using Hardhat's encrypted keystore file.
 This keystore file is specific to this _Hardhat_ project, you can run the following command in the CLI to display the

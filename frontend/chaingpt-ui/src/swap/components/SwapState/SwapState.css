@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+.form-state {
+  @apply flex flex-col mb-[20px] gap-[10px];
+
+  &:last-of-type {
+    @apply mb-0;
+  }
+}
+
+.form-state-title {
+  @apply flex flex-row justify-between gap-[8px];
+}
+
+.form-state-title-item {
+  @apply flex flex-row items-center justify-between gap-[8px];
+}
+
+.transaction-item {
+  @apply flex flex-row gap-[8px];
+}
+
+.form-state-loading {
+  @apply flex flex-row items-center justify-center w-[30px] h-[30px];
+
+  .loading {
+    @apply animate-spin;
+  }
+}
+
+.form-state-body {
+  @apply flex flex-col gap-[8px];
+}
+
+.form-state-transaction {
+  @apply flex flex-row justify-between text-[12px];
+}
+
+.button-restart {
+  @apply flex flex-row text-[10px] py-[2px] px-[8px] rounded-[4px] bg-[#7F56D9] cursor-pointer;
+  &[disabled] {
+    @apply bg-[#1C1920] text-[#3F3A46] cursor-default;
+  }
+}
+
+.form-state-number {
+  @apply flex flex-row text-[18px] justify-center items-center bg-[#7F56D9] w-[32px] h-[32px] rounded;
+}

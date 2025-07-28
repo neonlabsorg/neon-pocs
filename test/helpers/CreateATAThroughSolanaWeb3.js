@@ -12,7 +12,7 @@ import "dotenv/config"
 const connection = new web3.Connection(config.SOLANA_NODE, "processed");
 
 const defaultTokenMintsArray = [
-    config.DATA.SVM.ADDRESSES.devSAMO,
+    config.DATA.SVM.ADDRESSES.WSOL,
     config.DATA.SVM.ADDRESSES.devUSDC
 ];
 let atasToBeCreated = '';

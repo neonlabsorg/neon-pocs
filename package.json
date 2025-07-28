@@ -28,8 +28,6 @@
     "@openzeppelin/contracts": "5.2.0",
     "@openzeppelin/contracts-upgradeable": "5.2.0",
     "@openzeppelin/hardhat-upgrades": "^3.5.0",
-    "@orca-so/common-sdk": "^0.6.0-alpha.3",
-    "@orca-so/whirlpools-sdk": "^0.12.8",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.3.16",
@@ -49,6 +47,7 @@
   "dependencies": {
     "@aave/core-v3": "^1.19.3",
     "@metaplex-foundation/js": "^0.20.1",
+    "@neonevm/call-solana": "^1.0.2",
     "@neonevm/token-transfer-core": "^4.4.2",
     "@neonevm/token-transfer-ethers": "^4.4.2",
     "@pump-fun/pump-swap-sdk": "^0.0.1-beta.36",

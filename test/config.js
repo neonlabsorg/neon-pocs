@@ -7,12 +7,12 @@ const config = {
         EVM: {
             ADDRESSES: {
                 MemeLaunchpad: {
-                    MemeLaunchpadTest: '',
+                    MemeLaunchpadTest: '0x6A97C70e47Ab5d8B524C48B0FfFc570E51489ddA',
                     BondingCurve: '0x0Fc6Ec7F9F06bd733913C1Fcd10BFc959a1F88DC'
                 },
                 ERC20ForSplFactory: '0xF6b17787154C418d5773Ea22Afc87A95CAA3e957',
                 AAVE: {
-                    AaveFlashLoanTest: '0x1f464349eEAC5DbAD27c38cCe222d4D28bAc0824',
+                    AaveFlashLoanTest: '0x6A97C70e47Ab5d8B524C48B0FfFc570E51489ddA',
                     AAVE_POOL: '0x9eA85823b7B736189e663ddef0FEE250EF0d23E1', // Pool-Proxy-Aave.json
                     ADDRESS_PROVIDER: '0x3792F5eD078EEbE34419627E91D648e8Ac3C56e5'
                 },
@@ -22,9 +22,10 @@ const config = {
         },
         SVM: {
             ADDRESSES: {
-                WHIRLPOOLS_CONFIG: "FcrweFY1G9HJAHG5inkGB6pKg1HZ6x9UC2WioAfWrGkR",
-                devSAMO: "Jd4M8bfJG3sAkd82RsGWyEXoaBXQP7njFzBwEaCTuDa",
-                devUSDC: "BRjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k"
+                devUSDC_WSOL_Raydium_Pool: "5EqqFbCMGWuyHXQKx9XmfM9ygxFox5KfEmeNG8etdSfJ",
+                devUSDC: "BRjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k",
+                WSOL: "So11111111111111111111111111111111111111112",
+                USDC: "F4DgNXqiT3zUQA7dhqN5VzEPkRcd8vtqFwpJSwEEvnz5"
             }
         }
     },

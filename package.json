@@ -47,6 +47,7 @@
   "dependencies": {
     "@aave/core-v3": "^1.19.3",
     "@metaplex-foundation/js": "^0.20.1",
+    "@neonevm/solana-sign": "^0.2.1",
     "@neonevm/call-solana": "^1.0.2",
     "@neonevm/token-transfer-core": "^4.4.2",
     "@neonevm/token-transfer-ethers": "^4.4.2",
